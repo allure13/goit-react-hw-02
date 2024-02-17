@@ -39,7 +39,7 @@ export default function App() {
 
   //ф-ція для підрахунку відсотка позитивних відгуків
   const positiveFeedback = Math.round(
-    ((feedbackCount.good + feedbackCount.neutral) / totalFeedback) * 100
+    (feedbackCount.good / totalFeedback) * 100
   );
   // ф-ція скидання зібраних відгуків
   const resetFeedback = () => {
