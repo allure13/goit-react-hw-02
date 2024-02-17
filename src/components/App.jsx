@@ -1,27 +1,74 @@
 import './App.css';
-import userData from '../userData.json';
-import Profile from './Profile/Profile';
-import friends from '../friends.json';
-import FriendList from './FriendList/FriendList';
-import TransactionHistory from './TransactionHistory/TransactionHistory';
-import transactions from '../transactions.json';
+import Options from './Options/Options';
+import Feedback from './Feedback/Feedback';
+import Description from './Description/Description';
+import Notification from './Notification/Notification';
+import { useState, useEffect } from 'react';
 
-const App = () => {
+export default function App() {
+  const [feedbackCount, setFeedbackCount] = useState({
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  });
+
+  //ф-ція для збереження фідбеків у локал стор
+  useEffect(() => {
+    localStorage.setItem('feedbackCount', JSON.stringify(feedbackCount));
+  }, [feedbackCount]);
+
+  useEffect(() => {
+    const savedFeedback = localStorage.getItem('feedbackCount');
+    if (savedFeedback) {
+      setFeedbackCount(JSON.parse(savedFeedback));
+    } else {
+      localStorage.setItem('feedbackCount', JSON.stringify(feedbackCount));
+    }
+  }, []);
+
+  // ф-ція оновлення стану
+  const updateFeedback = feedbackType => {
+    setFeedbackCount(prevFeedback => ({
+      ...prevFeedback,
+      [feedbackType]: prevFeedback[feedbackType] + 1,
+    }));
+  };
+
+  //ф-ція для підрахунку загальної кількості відгуків
+  const totalFeedback =
+    feedbackCount.good + feedbackCount.neutral + feedbackCount.bad;
+
+  //ф-ція для підрахунку відсотка позитивних відгуків
+  const positiveFeedback = Math.round(
+    ((feedbackCount.good + feedbackCount.neutral) / totalFeedback) * 100
+  );
+  // ф-ція скидання зібраних відгуків
+  const resetFeedback = () => {
+    setFeedbackCount({
+      good: 0,
+      neutral: 0,
+      bad: 0,
+    });
+  };
+
   return (
     <>
-      <Profile
-        name={userData.username}
-        tag={userData.tag}
-        location={userData.location}
-        image={userData.avatar}
-        stats={userData.stats}
+      <Description />
+
+      <Options
+        updateFeedback={updateFeedback}
+        resetFeedback={resetFeedback}
+        totalFeedback={totalFeedback}
       />
-
-      <FriendList friends={friends} />
-
-      <TransactionHistory items={transactions} />
+      {totalFeedback ? (
+        <Feedback
+          feedback={feedbackCount}
+          totalFeedback={totalFeedback}
+          positiveFeedback={positiveFeedback}
+        />
+      ) : (
+        <Notification />
+      )}
     </>
   );
-};
-
-export default App;
+}
