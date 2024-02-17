@@ -12,19 +12,18 @@ export default function App() {
     bad: 0,
   });
 
+  useEffect(() => {
+    const savedFeedback = localStorage.getItem('feedbackCount');
+    if (savedFeedback !== null) {
+      return setFeedbackCount(JSON.parse(savedFeedback));
+    }
+    return 0;
+  }, []);
+
   //ф-ція для збереження фідбеків у локал стор
   useEffect(() => {
     localStorage.setItem('feedbackCount', JSON.stringify(feedbackCount));
   }, [feedbackCount]);
-
-  useEffect(() => {
-    const savedFeedback = localStorage.getItem('feedbackCount');
-    if (savedFeedback) {
-      setFeedbackCount(JSON.parse(savedFeedback));
-    } else {
-      localStorage.setItem('feedbackCount', JSON.stringify(feedbackCount));
-    }
-  }, []);
 
   // ф-ція оновлення стану
   const updateFeedback = feedbackType => {
